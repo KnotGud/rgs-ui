@@ -4,10 +4,13 @@
       <v-list nav>
         <v-list-item-group color="primary">
           <v-list-item
-            v-for="route in this.$router.options.routes"
+            v-for="route in routes"
             :key="route.name"
             v-bind:to="route.path"
           >
+            <v-list-item-icon>
+              <v-icon>{{ route.icon }}</v-icon>
+            </v-list-item-icon>
             <v-list-item-content>
               <v-list-item-title v-text="route.name"></v-list-item-title>
             </v-list-item-content>
@@ -48,7 +51,34 @@ export default {
 
   data: () => ({
     drawer: true,
-    group: null
+    group: null,
+    routes: [
+      {
+        name: "Home",
+        path: "/home",
+        icon: "mdi-image"
+      },
+      {
+        name: "About",
+        path: "/about",
+        icon: "mdi-image"
+      },
+      {
+        name: "Catalog",
+        path: "/catalog",
+        icon: "mdi-image"
+      },
+      {
+        name: "Library",
+        path: "/library",
+        icon: "mdi-image"
+      },
+      {
+        name: "Account",
+        path: "/account",
+        icon: "mdi-image"
+      }
+    ]
   })
 };
 </script>
