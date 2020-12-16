@@ -38,8 +38,8 @@
         Hide
       </v-btn>
     </v-overlay>
-    <v-snackbar v-model="snackbar" :timeout="2000">
-      Game Requested
+    <v-snackbar v-model="snackbar" :timeout="2500">
+      {{ snackbarText }}
       <template v-slot:action="{ attrs }">
         <v-btn color="error" text v-bind="attrs" @click="snackbar = false">
           Close
@@ -88,20 +88,42 @@ export default {
         platform: "console abc",
         owner: "Guy Bob"
       }
-	],
+    ],
     overlay: false,
     overlayGameID: 0,
-    snackbar: false
+    snackbar: false,
+    snackbarText: ""
   }),
+  computed: {
+    isSignedIn: function() {
+      return this.$store.getters.isSignedIn;
+    }
+  },
   methods: {
     viewGame: function(game) {
       this.overlayGameID = game.id;
       this.overlay = true;
     },
     request: function(game) {
+      if (this.isSignedIn) {
+        this.snackbarText = "Game Requested";
+        console.log(game);
+      } else {
+        this.snackbarText = "You must be signed in to request a game";
+      }
       this.snackbar = true;
-      console.log(game);
     }
+  },
+  mounted() {
+    this.$http
+      .get("catalog")
+      .then(resp => {
+        console.log(resp.data);
+        this.catalog = resp.data;
+      })
+      .catch(err => {
+        console.log(err);
+      });
   }
 };
 </script>

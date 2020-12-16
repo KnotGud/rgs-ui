@@ -7,7 +7,7 @@
         </h1>
 
         <p class="subheading font-weight-regular">
-          For help and information, please navigate to the about page.
+          For help and information, please navigate to the home page.
         </p>
       </v-col>
     </v-row>

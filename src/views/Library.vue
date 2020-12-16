@@ -26,7 +26,7 @@
                   md="4"
                   lg="3"
                 >
-                  <GameCard gameID="item.id" />
+                  <GameCard gameID="item.id" my="true" />
                 </v-col>
               </v-row>
             </template>
