@@ -8,7 +8,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     authStatus: "",
-    token: localStorage.getItem("token") || "",
+    token: "",
     user: {}
   },
   mutations: {
@@ -41,14 +41,12 @@ export default new Vuex.Store({
             const token = resp.data.token;
             const user = resp.data.user;
             console.log(user);
-            localStorage.setItem("token", token);
             axios.defaults.headers.common["Authorization"] = token;
             commit("auth_success", { token, user });
             resolve(resp);
           })
           .catch(err => {
             commit("auth_error");
-            localStorage.removeItem("token");
             reject(err);
           });
       });
@@ -64,14 +62,12 @@ export default new Vuex.Store({
           .then(resp => {
             const token = resp.data.token;
             const user = resp.data.user;
-            localStorage.setItem("token", token);
             axios.defaults.headers.common["Authorization"] = token;
             commit("auth_success", token, user);
             resolve(resp);
           })
           .catch(err => {
             commit("auth_error");
-            localStorage.removeItem("token");
             reject(err);
           });
       });
@@ -79,9 +75,27 @@ export default new Vuex.Store({
     signout({ commit }) {
       return new Promise(resolve => {
         commit("signout");
-        localStorage.removeItem("token");
         delete axios.defaults.headers.common["Authorization"];
         resolve();
+      });
+    },
+    update({ commit }, user) {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `user/${user.client_userID}`,
+          data: user,
+          method: "PUT"
+        })
+          .then(resp => {
+            const token = resp.data.token;
+            const user = resp.data.user;
+            axios.defaults.headers.common["Authorization"] = token;
+            commit("auth_success", token, user);
+            resolve(resp);
+          })
+          .catch(err => {
+            reject(err);
+          });
       });
     }
   },

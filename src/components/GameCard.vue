@@ -37,13 +37,7 @@
 export default {
   props: ["gameID", "my"],
   data: () => ({
-    game: {
-      name: "Some Game",
-      platform: "Some console",
-      developer: "Some Developer",
-      url: "https://en.wikipedia.org/wiki/Miracle_Piano_Teaching_System",
-      release: "1990"
-    }
+    game: {}
   }),
   computed: {
     user: function() {

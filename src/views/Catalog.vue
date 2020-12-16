@@ -35,7 +35,7 @@
     <v-overlay :value="overlay">
       <GameCard v-bind:gameID="overlayGameID" />
       <v-btn block @click="overlay = false">
-        Hide
+        Done
       </v-btn>
     </v-overlay>
     <v-snackbar v-model="snackbar" :timeout="2500">
@@ -68,33 +68,16 @@ export default {
       { text: "", sortable: false },
       { text: "", sortable: false }
     ],
-    catalog: [
-      {
-        id: 0,
-        name: "temp game",
-        platform: "some console",
-        owner: "Some Guy",
-        userID: 1
-      },
-      {
-        id: 1,
-        name: "action game",
-        platform: "console 365",
-        owner: "Bill Dude"
-      },
-      {
-        id: 2,
-        name: "strategy game",
-        platform: "console abc",
-        owner: "Guy Bob"
-      }
-    ],
+    catalog: [],
     overlay: false,
     overlayGameID: 0,
     snackbar: false,
     snackbarText: ""
   }),
   computed: {
+    user: function() {
+      return this.$store.state.user;
+    },
     isSignedIn: function() {
       return this.$store.getters.isSignedIn;
     }
@@ -106,6 +89,9 @@ export default {
     },
     request: function(game) {
       if (this.isSignedIn) {
+        this.$http.post(
+          `user/${this.user.id}/request/${game.userID}/${game.id}`
+        );
         this.snackbarText = "Game Requested";
         console.log(game);
       } else {

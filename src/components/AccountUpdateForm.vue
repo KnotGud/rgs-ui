@@ -12,7 +12,6 @@
                 v-model="firstName"
                 :rules="nameRules"
                 label="First Name"
-                required
                 outlined
               >
               </v-text-field>
@@ -22,7 +21,6 @@
                 v-model="lastName"
                 :rules="nameRules"
                 label="Last Name"
-                required
                 outlined
               >
               </v-text-field>
@@ -36,13 +34,13 @@
           </v-row>
           <v-row>
             <v-col>
-              <v-text-field v-model="address" label="Address" required outlined>
+              <v-text-field v-model="address" label="Address" outlined>
               </v-text-field>
             </v-col>
           </v-row>
           <v-row>
             <v-col cols="6">
-              <v-text-field v-model="city" label="City" required outlined>
+              <v-text-field v-model="city" label="City" outlined>
               </v-text-field>
             </v-col>
             <v-col cols="6">
@@ -58,22 +56,11 @@
           </v-row>
           <v-row>
             <v-col cols="6">
-              <v-text-field
-                v-model="zipcode"
-                label="Zip Code"
-                required
-                outlined
-              >
+              <v-text-field v-model="zipcode" label="Zip Code" outlined>
               </v-text-field>
             </v-col>
             <v-col cols="6">
-              <v-text-field
-                v-model="country"
-                label="Country"
-                required
-                disabled
-                outlined
-              >
+              <v-text-field v-model="country" label="Country" disabled outlined>
               </v-text-field>
             </v-col>
           </v-row>
@@ -81,9 +68,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn type="submit" color="primary" rounded :disabled="!valid"
-          >Update</v-btn
-        >
+        <v-btn type="submit" color="primary" rounded>Update</v-btn>
       </v-card-actions>
     </v-card>
   </v-form>
@@ -105,9 +90,15 @@ export default {
     zipcode: "",
     country: "United States"
   }),
+  computed: {
+    user: function() {
+      return this.$store.state.user;
+    }
+  },
   methods: {
     update: function() {
       let formData = {
+        client_userID: this.user.id,
         firstName: this.firstName,
         lastName: this.lastName,
         address: this.address,
@@ -117,7 +108,7 @@ export default {
         country: this.country
       };
       this.$store
-        .dispatch("updateAccount", { formData })
+        .dispatch("update", formData)
         .then(() => this.$router.push("/"))
         .catch(err => console.log(err));
     }

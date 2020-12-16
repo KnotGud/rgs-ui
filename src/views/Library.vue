@@ -18,7 +18,12 @@
                 ></v-text-field>
               </v-card-title>
               <v-card-text>
-                <v-data-iterator :items="myGames" :search="searchMy">
+                <v-data-iterator
+                  :items="myGames"
+                  :search="searchMy"
+                  :items-per-page="4"
+                  :footer-props="{ 'items-per-page-options': [4, 8, 12, -1] }"
+                >
                   <template v-slot:default="props">
                     <v-row>
                       <v-col
@@ -40,6 +45,13 @@
                 </v-data-iterator>
               </v-card-text>
             </v-card>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col class="text-right">
+            <v-btn color="primary" @click="overlayAddGame = true"
+              >Add Game</v-btn
+            >
           </v-col>
         </v-row>
         <v-row>
@@ -68,11 +80,55 @@
                     <td>{{ row.item.BORROWER }}</td>
                     <td>{{ row.item.STATUS }}</td>
                     <td>
-                      <v-btn text @click="viewGame(row.item)"> </v-btn>
-                    </td>
-                    <td>
-                      <v-btn text @click="request(row.item)">
-                        request
+                      <v-btn
+                        v-if="isOwner(row.item) && row.item.STATUS == 'pending'"
+                        color="primary"
+                        @click="accept(row.item)"
+                      >
+                        Accept
+                      </v-btn>
+                      <v-btn
+                        v-if="isOwner(row.item) && row.item.STATUS == 'pending'"
+                        color="error"
+                        @click="deny(row.item)"
+                      >
+                        Deny
+                      </v-btn>
+                      <v-btn
+                        v-if="
+                          isOwner(row.item) && row.item.STATUS == 'approved'
+                        "
+                        color="primary"
+                        @click="viewShipping(row.item.BORROWER)"
+                      >
+                        Show Shipping Info
+                      </v-btn>
+                      <v-btn
+                        v-if="
+                          !isOwner(row.item) && row.item.STATUS == 'approved'
+                        "
+                        color="primary"
+                        @click="received(row.item)"
+                      >
+                        Game Recieved
+                      </v-btn>
+                      <v-btn
+                        v-if="
+                          isOwner(row.item) && row.item.STATUS == 'received'
+                        "
+                        color="primary"
+                        @click="returned(row.item)"
+                      >
+                        Game Returned
+                      </v-btn>
+                      <v-btn
+                        v-if="
+                          !isOwner(row.item) && row.item.STATUS == 'received'
+                        "
+                        color="primary"
+                        @click="viewShipping(row.item.LENDER)"
+                      >
+                        Show Shipping Info
                       </v-btn>
                     </td>
                   </tr>
@@ -83,8 +139,29 @@
         </v-row>
       </v-container>
     </div>
-    <v-overlay :value="overlay">
-      <GameCard gameID="overlayGameID" />
+    <v-overlay :value="overlayAddGame">
+      <GameSearchCard />
+      <v-btn
+        block
+        @click="
+          overlayAddGame = false;
+          fetch();
+        "
+      >
+        Done
+      </v-btn>
+    </v-overlay>
+    <v-overlay :value="overlayUser">
+      <UserCard v-bind:userID="overlayUserID" />
+      <v-btn
+        block
+        @click="
+          overlayUser = false;
+          fetch();
+        "
+      >
+        Done
+      </v-btn>
     </v-overlay>
     <v-snackbar v-model="snackbar" :timeout="2000">
       {{ snackbarText }}
@@ -99,10 +176,12 @@
 
 <script>
 import GameCard from "@/components/GameCard.vue";
+import GameSearchCard from "@/components/GameSearchCard.vue";
+import UserCard from "@/components/UserCard.vue";
 import SecurePage from "@/components/SecurePage.vue";
 
 export default {
-  components: { SecurePage, GameCard },
+  components: { SecurePage, GameCard, UserCard, GameSearchCard },
   computed: {
     isSignedIn: function() {
       return this.$store.getters.isSignedIn;
@@ -129,8 +208,9 @@ export default {
       { text: "", sortable: false },
       { text: "", sortable: false }
     ],
-    overlay: false,
-    overlayGameID: 0,
+    overlayAddGame: false,
+    overlayUser: false,
+    overlayUserID: "",
     snackbar: false,
     snackbarText: ""
   }),
@@ -156,8 +236,59 @@ export default {
           console.log(err);
         });
     },
+    addGame: function() {
+      this.overlayUser = true;
+    },
     isOwner: function(request) {
       return request.LENDER == this.user.id;
+    },
+    accept: function(request) {
+      this.$http
+        .put(`/user/${this.user.id}/request/${request.ID}/approved`)
+        .then(() => {
+          this.fetch();
+        })
+        .catch(err => {
+          console.log(err);
+          this.fetch();
+        });
+    },
+    deny: function(request) {
+      this.$http
+        .put(`/user/${this.user.id}/request/${request.ID}/denied`)
+        .then(() => {
+          this.fetch();
+        })
+        .catch(err => {
+          console.log(err);
+          this.fetch();
+        });
+    },
+    received: function(request) {
+      this.$http
+        .put(`/user/${this.user.id}/request/${request.ID}/received`)
+        .then(() => {
+          this.fetch();
+        })
+        .catch(err => {
+          console.log(err);
+          this.fetch();
+        });
+    },
+    returned: function(request) {
+      this.$http
+        .put(`/user/${this.user.id}/request/${request.ID}/returned`)
+        .then(() => {
+          this.fetch();
+        })
+        .catch(err => {
+          console.log(err);
+          this.fetch();
+        });
+    },
+    viewShipping: function(userID) {
+      this.overlayUserID = userID;
+      this.overlayUser = true;
     }
   },
   mounted() {
