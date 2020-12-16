@@ -17,22 +17,28 @@
           </v-list-item>
         </v-list-item-group>
       </v-list>
+      <template v-slot:append v-if="isSignedIn">
+        <div>
+          <v-btn color="error" block @click="signout">
+            Sign Out
+          </v-btn>
+        </div>
+      </template>
     </v-navigation-drawer>
 
     <v-app-bar color="primary" app clipped-left>
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-toolbar-title>Retro Game Share UI</v-toolbar-title>
+      <v-toolbar-title>Retro Game Exchange</v-toolbar-title>
 
       <v-spacer></v-spacer>
 
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
+      <v-btn color="secondary" to="/signin" v-if="!isSignedIn">
+        <v-icon left>mdi-account</v-icon>
+        Sign In
       </v-btn>
+      <v-toolbar-title v-if="isSignedIn">
+        Welcome {{ user.name }}
+      </v-toolbar-title>
     </v-app-bar>
 
     <v-main>
@@ -49,6 +55,22 @@ export default {
 
   components: {},
 
+  computed: {
+    user: function() {
+      return this.$store.state.user;
+    },
+    isSignedIn: function() {
+      return this.$store.getters.isSignedIn;
+    }
+  },
+  methods: {
+    signout: function() {
+      this.$store.dispatch("signout").then(() => {
+        this.$router.push("/");
+      });
+    }
+  },
+
   data: () => ({
     drawer: true,
     group: null,
@@ -56,27 +78,22 @@ export default {
       {
         name: "Home",
         path: "/home",
-        icon: "mdi-image"
-      },
-      {
-        name: "About",
-        path: "/about",
-        icon: "mdi-image"
+        icon: "mdi-home"
       },
       {
         name: "Catalog",
         path: "/catalog",
-        icon: "mdi-image"
+        icon: "mdi-view-list"
       },
       {
         name: "Library",
         path: "/library",
-        icon: "mdi-image"
+        icon: "mdi-library-shelves"
       },
       {
         name: "Account",
         path: "/account",
-        icon: "mdi-image"
+        icon: "mdi-account"
       }
     ]
   })
