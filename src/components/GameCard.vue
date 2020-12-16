@@ -56,22 +56,19 @@ export default {
     },
     deleteGame: function() {
       this.$http.delete(`/user/${this.user.id}/collection/${this.gameID}`);
-      this.fetch();
-    },
-    fetch: function() {
-      this.$http
-        .get(`game/${this.gameID}`)
-        .then(resp => {
-          console.log(resp.data);
-          this.game = resp.data;
-        })
-        .catch(err => {
-          console.log(err);
-        });
+      this.$emit("reload");
     }
   },
   mounted() {
-    this.fetch();
+    this.$http
+      .get(`game/${this.gameID}`)
+      .then(resp => {
+        console.log(resp.data);
+        this.game = resp.data;
+      })
+      .catch(err => {
+        console.log(err);
+      });
   }
 };
 </script>
