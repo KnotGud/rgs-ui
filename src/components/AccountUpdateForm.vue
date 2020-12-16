@@ -1,77 +1,82 @@
 <template>
-  <v-form v-model="valid" @submit.prevent="update">
-    <v-card outlined>
-      <v-card-title>
-        Update Account Information
-      </v-card-title>
-      <v-card-text>
-        <v-container>
-          <v-row>
-            <v-col cols="6">
-              <v-text-field
-                v-model="firstName"
-                :rules="nameRules"
-                label="First Name"
-                outlined
-              >
-              </v-text-field>
-            </v-col>
-            <v-col cols="6">
-              <v-text-field
-                v-model="lastName"
-                :rules="nameRules"
-                label="Last Name"
-                outlined
-              >
-              </v-text-field>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col>
-              Shipping Information
-              <v-divider> </v-divider>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col>
-              <v-text-field v-model="address" label="Address" outlined>
-              </v-text-field>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="6">
-              <v-text-field v-model="city" label="City" outlined>
-              </v-text-field>
-            </v-col>
-            <v-col cols="6">
-              <v-select
-                v-model="state"
-                :items="['Washington', 'Oregon']"
-                label="State"
-                required
-                outlined
-              >
-              </v-select>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="6">
-              <v-text-field v-model="zipcode" label="Zip Code" outlined>
-              </v-text-field>
-            </v-col>
-            <v-col cols="6">
-              <v-text-field v-model="country" label="Country" disabled outlined>
-              </v-text-field>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn type="submit" color="primary" rounded>Update</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-form>
+  <div>
+    <v-form v-model="valid" @submit.prevent="update">
+      <v-card outlined>
+        <v-card-title>
+          Update Account Information
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="6">
+                <v-text-field v-model="firstName" label="First Name" outlined>
+                </v-text-field>
+              </v-col>
+              <v-col cols="6">
+                <v-text-field v-model="lastName" label="Last Name" outlined>
+                </v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                Shipping Information
+                <v-divider> </v-divider>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-text-field v-model="address" label="Address" outlined>
+                </v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="6">
+                <v-text-field v-model="city" label="City" outlined>
+                </v-text-field>
+              </v-col>
+              <v-col cols="6">
+                <v-select
+                  v-model="state"
+                  :items="['Washington', 'Oregon']"
+                  label="State"
+                  required
+                  outlined
+                >
+                </v-select>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="6">
+                <v-text-field v-model="zipcode" label="Zip Code" outlined>
+                </v-text-field>
+              </v-col>
+              <v-col cols="6">
+                <v-text-field
+                  v-model="country"
+                  label="Country"
+                  disabled
+                  outlined
+                >
+                </v-text-field>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn type="submit" color="primary" rounded>Update</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-form>
+    <v-snackbar v-model="snackbar" :timeout="2500">
+      {{ snackbarText }}
+      <template v-slot:action="{ attrs }">
+        <v-btn color="error" text v-bind="attrs" @click="snackbar = false">
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
+  </div>
 </template>
 
 <script>
@@ -80,15 +85,13 @@ export default {
     valid: false,
     firstName: "",
     lastName: "",
-    nameRules: [
-      v => !!v || "Name is required",
-      v => v.length <= 20 || "Name must be less than 20 characters"
-    ],
     address: "",
     city: "",
     state: "",
     zipcode: "",
-    country: "United States"
+    country: "United States",
+    snackbar: false,
+    snackbarText: ""
   }),
   computed: {
     user: function() {
@@ -110,7 +113,10 @@ export default {
       this.$store
         .dispatch("update", formData)
         .then(() => this.$router.push("/"))
-        .catch(err => console.log(err));
+        .catch(err => {
+          this.snackbarText = err.response.data;
+          this.snackbar = true;
+        });
     }
   }
 };

@@ -88,16 +88,21 @@ export default {
       this.overlay = true;
     },
     request: function(game) {
-      if (this.isSignedIn) {
-        this.$http.post(
-          `user/${this.user.id}/request/${game.userID}/${game.id}`
-        );
-        this.snackbarText = "Game Requested";
-        console.log(game);
-      } else {
+      if (!this.isSignedIn) {
         this.snackbarText = "You must be signed in to request a game";
+        this.snackbar = true;
+        return;
       }
-      this.snackbar = true;
+      this.$http
+        .post(`user/${this.user.id}/request/${game.userID}/${game.id}`)
+        .then(() => {
+          this.snackbarText = "Game Requested";
+          this.snackbar = true;
+        })
+        .catch(err => {
+          this.snackbarText = err.response.data;
+          this.snackbar = true;
+        });
     }
   },
   mounted() {

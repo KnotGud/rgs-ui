@@ -13,9 +13,13 @@
           <v-col> Address: {{ userData.address }}</v-col>
         </v-row>
         <v-row>
-          <v-col cols="4"> City: {{ userData.city }}</v-col>
-          <v-col cols="4"> State: {{ userData.state }}</v-col>
-          <v-col cols="4"> Zip: {{ userData.zipcode }}</v-col>
+          <v-col> City: {{ userData.city }}</v-col>
+        </v-row>
+        <v-row>
+          <v-col> State: {{ userData.state }}</v-col>
+        </v-row>
+        <v-row>
+          <v-col> Zip: {{ userData.zipcode }}</v-col>
         </v-row>
       </v-container>
     </v-card-text>
